@@ -35,10 +35,11 @@ class MainWindow(QMainWindow):
         ax_y.tickStrings = lambda values, scale, spacing: [f'{int(v)}' for v in values]
 
         self.shapefile_manager = ShapefileManager(self.plot_widget)
-        
+
         self.setCentralWidget(self.plot_widget)
 
         self.create_menu()
+        self.create_toolbar()
 
     def create_menu(self):
         menu_bar = self.menuBar()
@@ -52,6 +53,12 @@ class MainWindow(QMainWindow):
         attribute_table_action = QAction('Attribute Table', self)
         attribute_table_action.triggered.connect(self.show_attribute_table)
         view_menu.addAction(attribute_table_action)
+
+    def create_toolbar(self):
+        toolbar = self.addToolBar('Tools')
+        assign_ids_action = QAction('Assign IDs', self)
+        assign_ids_action.triggered.connect(self.assign_ids)
+        toolbar.addAction(assign_ids_action)
 
     def load_shapefile(self):
         file_name, _ = QFileDialog.getOpenFileName(
@@ -99,6 +106,14 @@ class MainWindow(QMainWindow):
 
         table_widget.resizeColumnsToContents()
         table_dialog.exec()
+
+    def assign_ids(self):
+        assigned_count = self.shapefile_manager.assign_ids()
+        if assigned_count is None:
+            QMessageBox.information(self, 'No Layer Loaded', 'Please load a shapefile first.')
+            return
+
+        QMessageBox.information(self, 'IDs Assigned', f'Assigned BLD IDs to {assigned_count} features.')
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

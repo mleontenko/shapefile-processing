@@ -61,3 +61,11 @@ class ShapefileManager:
             return None
 
         return self.loaded_gdf.drop(columns='geometry', errors='ignore')
+
+    def assign_ids(self):
+        if self.loaded_gdf is None:
+            return None
+
+        feature_count = len(self.loaded_gdf)
+        self.loaded_gdf['id'] = [f'BLD_{index}' for index in range(1, feature_count + 1)]
+        return feature_count
