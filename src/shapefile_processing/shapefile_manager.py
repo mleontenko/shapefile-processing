@@ -8,9 +8,11 @@ import pyqtgraph as pg
 class ShapefileManager:
     def __init__(self, plot_widget):
         self.plot_widget = plot_widget
+        self.loaded_gdf = None
 
     def load_and_render(self, file_name):
         gdf = gpd.read_file(file_name)
+        self.loaded_gdf = gdf
 
         self.plot_widget.clear()
 
@@ -53,3 +55,9 @@ class ShapefileManager:
             self.plot_widget.setYRange(min_y, max_y, padding=0.05)
         else:
             self.plot_widget.enableAutoRange()
+
+    def get_attributes(self):
+        if self.loaded_gdf is None:
+            return None
+
+        return self.loaded_gdf.drop(columns='geometry', errors='ignore')
