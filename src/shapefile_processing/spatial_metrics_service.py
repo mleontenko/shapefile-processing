@@ -93,3 +93,8 @@ class SpatialMetricsService:
         gdf[column_name] = neighbor_count.reindex(row_index, fill_value=0).values
 
         return gdf
+    
+    def calculate_centroid_coordinates(self, gdf, x_column='centroid_x', y_column='centroid_y'):
+        gdf[x_column] = gdf.geometry.centroid.x
+        gdf[y_column] = gdf.geometry.centroid.y
+        return gdf

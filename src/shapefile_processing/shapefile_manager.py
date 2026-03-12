@@ -73,6 +73,15 @@ class ShapefileManager:
         )
         return len(self.loaded_gdf)
 
+    def calculate_centroid_coordinates(self):
+        if self.loaded_gdf is None:
+            return None
+
+        self.loaded_gdf = self.spatial_metrics_service.calculate_centroid_coordinates(
+            self.loaded_gdf,
+        )
+        return len(self.loaded_gdf)
+
     def export_shapefile(self, output_path):
         if self.loaded_gdf is None:
             return False
