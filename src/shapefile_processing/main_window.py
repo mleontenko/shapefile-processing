@@ -130,11 +130,12 @@ class MainWindow(QMainWindow):
             return
 
         self.shapefile_manager.calculate_perimeter()
+        self.shapefile_manager.calculate_distance_to_nearest_neighbor()
 
         QMessageBox.information(
             self,
             'Spatial Attributes Calculated',
-            f'Calculated area and perimeter for {updated_count} features.',
+            f'Calculated area, perimeter, and dnn for {updated_count} features.',
         )
 
     def export_shapefile(self):

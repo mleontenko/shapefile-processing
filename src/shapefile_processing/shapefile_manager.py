@@ -54,6 +54,15 @@ class ShapefileManager:
         self.loaded_gdf = self.spatial_metrics_service.calculate_perimeter(self.loaded_gdf)
         return len(self.loaded_gdf)
 
+    def calculate_distance_to_nearest_neighbor(self):
+        if self.loaded_gdf is None:
+            return None
+
+        self.loaded_gdf = self.spatial_metrics_service.calculate_distance_to_nearest_neighbor(
+            self.loaded_gdf,
+        )
+        return len(self.loaded_gdf)
+
 
     def export_shapefile(self, output_path):
         if self.loaded_gdf is None:
