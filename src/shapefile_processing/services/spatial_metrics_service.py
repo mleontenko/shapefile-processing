@@ -2,21 +2,29 @@ import geopandas as gpd
 
 
 class SpatialMetricsService:
-    def calculate_area(self, gdf, column_name='area'):
+    def calculate_area(
+        self,
+        gdf: gpd.GeoDataFrame,
+        column_name: str = 'area',
+    ) -> gpd.GeoDataFrame:
         gdf[column_name] = gdf.geometry.area
         return gdf
 
-    def calculate_perimeter(self, gdf, column_name='perimeter'):
+    def calculate_perimeter(
+        self,
+        gdf: gpd.GeoDataFrame,
+        column_name: str = 'perimeter',
+    ) -> gpd.GeoDataFrame:
         gdf[column_name] = gdf.geometry.length
         return gdf
 
     def calculate_distance_to_nearest_neighbor(
         self,
-        gdf,
-        column_name='dist_near',
-        nearest_column_name='nearest',
-        id_column_name='id',
-    ):
+        gdf: gpd.GeoDataFrame,
+        column_name: str = 'dist_near',
+        nearest_column_name: str = 'nearest',
+        id_column_name: str = 'id',
+    ) -> gpd.GeoDataFrame:
         left = gdf.reset_index(drop=True)
         right = left.copy()
 
@@ -67,7 +75,12 @@ class SpatialMetricsService:
         gdf[column_name] = nearest_per_feature[column_name].reindex(row_index).values
         return gdf
 
-    def calculate_number_of_neighbors(self, gdf, radius=1.0, column_name='num_neighb'):
+    def calculate_number_of_neighbors(
+        self,
+        gdf: gpd.GeoDataFrame,
+        radius: float = 1.0,
+        column_name: str = 'num_neighb',
+    ) -> gpd.GeoDataFrame:
         left = gdf.reset_index(drop=True)
         right = left.copy()
 
@@ -94,7 +107,12 @@ class SpatialMetricsService:
 
         return gdf
 
-    def calculate_centroid_coordinates(self, gdf, x_column='centroid_x', y_column='centroid_y'):
+    def calculate_centroid_coordinates(
+        self,
+        gdf: gpd.GeoDataFrame,
+        x_column: str = 'centroid_x',
+        y_column: str = 'centroid_y',
+    ) -> gpd.GeoDataFrame:
         gdf[x_column] = gdf.geometry.centroid.x
         gdf[y_column] = gdf.geometry.centroid.y
         return gdf
