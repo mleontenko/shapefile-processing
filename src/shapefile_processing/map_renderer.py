@@ -32,6 +32,19 @@ class MapRenderer:
                 graphics_polygon.setBrush(QBrush(QColor(70, 95, 130, 150)))
                 self.plot_widget.addItem(graphics_polygon)
 
+    def render_labels(self, gdf, column_name='id'):
+        for _, row in gdf.iterrows():
+            if row.geometry is None or row.geometry.is_empty:
+                continue
+            centroid = row.geometry.centroid
+            label = pg.TextItem(
+                text=str(row[column_name]),
+                color=(0, 0, 0),
+                anchor=(0.5, 0.5),
+            )
+            label.setPos(centroid.x, centroid.y)
+            self.plot_widget.addItem(label)
+
     def set_plot_range(self, gdf):
         bounds = gdf.total_bounds
         min_x, min_y, max_x, max_y = bounds
