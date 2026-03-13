@@ -1,3 +1,5 @@
+from os import PathLike
+
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import (
     QDialog,
@@ -17,7 +19,7 @@ pg.setConfigOptions(antialias=True)
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle('Shapefile Loader')
         self.setGeometry(100, 100, 800, 600)
@@ -41,10 +43,14 @@ class MainWindow(QMainWindow):
         self.create_menu()
         self.create_toolbar()
 
-    def create_menu(self):
+    def create_menu(self) -> None:
         menu_bar = self.menuBar()
+        # satisfy type checker that menu_bar is not None, since QMainWindow.menuBar() should always return a valid QMenuBar instance
+        assert menu_bar is not None
         file_menu = menu_bar.addMenu('File')
         view_menu = menu_bar.addMenu('View')
+        assert file_menu is not None
+        assert view_menu is not None
 
         load_action = QAction('Load Shapefile', self)
         load_action.triggered.connect(self.load_shapefile)
@@ -58,8 +64,9 @@ class MainWindow(QMainWindow):
         attribute_table_action.triggered.connect(self.show_attribute_table)
         view_menu.addAction(attribute_table_action)
 
-    def create_toolbar(self):
+    def create_toolbar(self) -> None:
         toolbar = self.addToolBar('Tools')
+        assert toolbar is not None
         self.assign_ids_action = QAction('1. Assign IDs', self)
         self.assign_ids_action.triggered.connect(self.assign_ids)
         toolbar.addAction(self.assign_ids_action)
@@ -74,7 +81,7 @@ class MainWindow(QMainWindow):
 
         self.update_layer_actions()
 
-    def update_layer_actions(self):
+    def update_layer_actions(self) -> None:
         has_loaded_features = (
             self.shapefile_manager.loaded_gdf is not None
             and not self.shapefile_manager.loaded_gdf.empty
@@ -83,7 +90,7 @@ class MainWindow(QMainWindow):
         self.calculate_spatial_attributes_action.setEnabled(has_loaded_features)
         self.data_quality_action.setEnabled(has_loaded_features)
 
-    def load_shapefile(self):
+    def load_shapefile(self) -> None:
         file_name, _ = QFileDialog.getOpenFileName(
             self,
             'Load Shapefile',
@@ -93,7 +100,7 @@ class MainWindow(QMainWindow):
         if file_name:
             self.render_shapefile(file_name)
 
-    def render_shapefile(self, file_name):
+    def render_shapefile(self, file_name: str | PathLike[str]) -> None:
         try:
             has_features = self.shapefile_manager.load_and_render(file_name)
         except Exception as error:
@@ -108,7 +115,7 @@ class MainWindow(QMainWindow):
 
         self.update_layer_actions()
 
-    def show_attribute_table(self):
+    def show_attribute_table(self) -> None:
         attributes = self.shapefile_manager.get_attributes()
         if attributes is None:
             QMessageBox.information(self, 'No Layer Loaded', 'Please load a shapefile first.')
@@ -134,7 +141,7 @@ class MainWindow(QMainWindow):
         table_widget.resizeColumnsToContents()
         table_dialog.exec()
 
-    def assign_ids(self):
+    def assign_ids(self) -> None:
         assigned_count = self.shapefile_manager.assign_ids()
         if assigned_count is None:
             QMessageBox.information(self, 'No Layer Loaded', 'Please load a shapefile first.')
@@ -142,7 +149,7 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(self, 'IDs Assigned', f'Assigned BLD IDs to {assigned_count} features.')
 
-    def calculate_spatial_attributes(self):
+    def calculate_spatial_attributes(self) -> None:
         updated_count = self.shapefile_manager.calculate_area()
         if updated_count is None:
             QMessageBox.information(self, 'No Layer Loaded', 'Please load a shapefile first.')
@@ -159,13 +166,22 @@ class MainWindow(QMainWindow):
             f'Calculated area, perimeter, nearest neighbour distance, number of neighbors, and centroid coordinates for {updated_count} features.',
         )
 
-    def data_quality_checks(self):
+    def data_quality_checks(self) -> None:
         if self.shapefile_manager.loaded_gdf is None:
             QMessageBox.information(self, 'No Layer Loaded', 'Please load a shapefile first.')
             return
 
-        invalid_count, total_count = self.shapefile_manager.detect_invalid_geometry()
-        overlap_count, _ = self.shapefile_manager.detect_overlapping_polygons()
+        invalid_result = self.shapefile_manager.detect_invalid_geometry()
+        if invalid_result is None:
+            QMessageBox.information(self, 'No Layer Loaded', 'Please load a shapefile first.')
+            return
+        invalid_count, total_count = invalid_result
+
+        overlap_result = self.shapefile_manager.detect_overlapping_polygons()
+        if overlap_result is None:
+            QMessageBox.information(self, 'No Layer Loaded', 'Please load a shapefile first.')
+            return
+        overlap_count, _ = overlap_result
 
         QMessageBox.information(
             self,
@@ -179,7 +195,7 @@ class MainWindow(QMainWindow):
             f'  - "overlap"      (True = overlaps another polygon)',
         )
 
-    def export_shapefile(self):
+    def export_shapefile(self) -> None:
         output_path, _ = QFileDialog.getSaveFileName(
             self,
             'Export Shapefile',
