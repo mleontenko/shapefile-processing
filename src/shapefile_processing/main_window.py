@@ -1,3 +1,5 @@
+"""Main application window for loading, analyzing, and exporting shapefiles."""
+
 from os import PathLike
 
 import pyqtgraph as pg
@@ -21,7 +23,10 @@ pg.setConfigOptions(antialias=True)
 
 
 class MainWindow(QMainWindow):
+    """Top-level GUI window coordinating map display and user actions."""
+
     def __init__(self) -> None:
+        """Initialize widgets, services, and menu/toolbar actions."""
         super().__init__()
         self.setWindowTitle("Shapefile Loader")
         self.setGeometry(100, 100, 800, 600)
@@ -51,6 +56,7 @@ class MainWindow(QMainWindow):
         self.create_toolbar()
 
     def create_menu(self) -> None:
+        """Create File and View menus with their actions."""
         menu_bar = self.menuBar()
         # satisfy type checker that menu_bar is not None, since QMainWindow.menuBar()
         # should always return a valid QMenuBar instance
@@ -73,6 +79,7 @@ class MainWindow(QMainWindow):
         view_menu.addAction(attribute_table_action)
 
     def create_toolbar(self) -> None:
+        """Create toolbar actions for IDs, spatial attributes, and quality checks."""
         toolbar = self.addToolBar("Tools")
         assert toolbar is not None
         self.assign_ids_action = QAction("1. Assign IDs", self)
@@ -94,6 +101,7 @@ class MainWindow(QMainWindow):
         self.update_layer_actions()
 
     def update_layer_actions(self) -> None:
+        """Enable or disable actions based on whether a non-empty layer is loaded."""
         has_loaded_features = (
             self.shapefile_manager.loaded_gdf is not None
             and not self.shapefile_manager.loaded_gdf.empty
@@ -106,17 +114,32 @@ class MainWindow(QMainWindow):
     # button is repositioned when the app first appears
     # showEvent is triggered after window is shown
     def showEvent(self, event: QShowEvent | None) -> None:
+        """Reposition the zoom button after the window is shown.
+
+        Args:
+            event (QShowEvent | None): Qt show event for the window.
+        """
         super().showEvent(event)
         self.zoom_to_data_overlay.schedule_reposition()
 
     # catches fullscreen/maximize transitions
     # changeEvent is triggered when state/property changes
     def changeEvent(self, event: QEvent | None) -> None:
+        """Reposition the zoom button when window state changes.
+
+        Args:
+            event (QEvent | None): Qt state-change event for the window.
+        """
         super().changeEvent(event)
         if event is not None and event.type() == QEvent.Type.WindowStateChange:
             self.zoom_to_data_overlay.schedule_reposition()
 
     def load_shapefile(self) -> None:
+        """Open a file picker and load a selected shapefile.
+
+        Returns:
+            None
+        """
         file_name, _ = QFileDialog.getOpenFileName(
             self,
             "Load Shapefile",
@@ -127,6 +150,11 @@ class MainWindow(QMainWindow):
             self.render_shapefile(file_name)
 
     def render_shapefile(self, file_name: str | PathLike[str]) -> None:
+        """Load and render a shapefile path, showing user feedback on outcomes.
+
+        Args:
+            file_name (str | PathLike[str]): Path to the shapefile to render.
+        """
         try:
             has_features = self.shapefile_manager.load_and_render(file_name)
         except Exception as error:
@@ -146,6 +174,7 @@ class MainWindow(QMainWindow):
         self.update_layer_actions()
 
     def show_attribute_table(self) -> None:
+        """Display loaded attributes in a modal table dialog."""
         attributes = self.shapefile_manager.get_attributes()
         if attributes is None:
             QMessageBox.information(
@@ -176,6 +205,7 @@ class MainWindow(QMainWindow):
         table_dialog.exec()
 
     def assign_ids(self) -> None:
+        """Assign IDs to loaded features and notify the user."""
         assigned_count = self.shapefile_manager.assign_ids()
         if assigned_count is None:
             QMessageBox.information(
@@ -188,6 +218,7 @@ class MainWindow(QMainWindow):
         )
 
     def calculate_spatial_attributes(self) -> None:
+        """Run spatial metric calculations for the loaded layer and show summary."""
         updated_count = self.shapefile_manager.calculate_area()
         if updated_count is None:
             QMessageBox.information(
@@ -212,6 +243,7 @@ class MainWindow(QMainWindow):
         )
 
     def data_quality_checks(self) -> None:
+        """Run data quality checks and show counts for each check."""
         if self.shapefile_manager.loaded_gdf is None:
             QMessageBox.information(
                 self, "No Layer Loaded", "Please load a shapefile first."
@@ -257,6 +289,7 @@ class MainWindow(QMainWindow):
         )
 
     def zoom_to_data(self) -> None:
+        """Adjust map view bounds to the extent of loaded features."""
         gdf = self.shapefile_manager.loaded_gdf
         if gdf is None or gdf.empty:
             QMessageBox.information(
@@ -267,6 +300,7 @@ class MainWindow(QMainWindow):
         self.map_renderer.set_plot_range(gdf)
 
     def export_shapefile(self) -> None:
+        """Export the current layer to a user-selected shapefile path."""
         output_path, _ = QFileDialog.getSaveFileName(
             self,
             "Export Shapefile",

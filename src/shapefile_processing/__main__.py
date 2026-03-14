@@ -1,3 +1,5 @@
+"""Entry point for launching the shapefile-processing desktop application."""
+
 import sys
 
 from PyQt6.QtWidgets import QApplication
