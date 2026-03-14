@@ -12,7 +12,7 @@ import pyqtgraph as pg
 
 
 class ZoomToDataButton(QObject):
-    """Overlay button that triggers zooming to data when clicked. 
+    """Overlay button that triggers zooming to data when clicked.
     It is positioned in the bottom-right corner of the plot and 
     adjusts its position on window resize or state changes.
     """
@@ -48,7 +48,8 @@ class ZoomToDataButton(QObject):
     def schedule_reposition(self) -> None:
         """Schedules the button to be repositioned on the next event loop cycle
         after Qt finishes processing current events and updating the layout.
-        This ensures layout is ready."""
+        This ensures layout is ready.
+        """
         QTimer.singleShot(0, self.reposition)
 
     # catches manual resize events

@@ -4,8 +4,8 @@ import geopandas as gpd
 import pandas as pd
 import pyqtgraph as pg
 
-from shapefile_processing.services.data_quality_services import DataQualityServices
 from shapefile_processing.map_renderer import MapRenderer
+from shapefile_processing.services.data_quality_services import DataQualityServices
 from shapefile_processing.services.spatial_metrics_service import SpatialMetricsService
 
 

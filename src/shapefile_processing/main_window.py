@@ -1,5 +1,6 @@
 from os import PathLike
 
+import pyqtgraph as pg
 from PyQt6.QtCore import QEvent
 from PyQt6.QtGui import QAction, QShowEvent
 from PyQt6.QtWidgets import (
@@ -11,7 +12,6 @@ from PyQt6.QtWidgets import (
     QTableWidgetItem,
     QVBoxLayout,
 )
-import pyqtgraph as pg
 
 from shapefile_processing.map_renderer import MapRenderer
 from shapefile_processing.shapefile_manager import ShapefileManager

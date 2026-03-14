@@ -1,8 +1,8 @@
+import geopandas as gpd
+import pyqtgraph as pg
 from PyQt6.QtCore import QPointF, QRectF
 from PyQt6.QtGui import QBrush, QColor, QPolygonF
 from PyQt6.QtWidgets import QGraphicsPolygonItem
-import geopandas as gpd
-import pyqtgraph as pg
 
 
 class MapRenderer:

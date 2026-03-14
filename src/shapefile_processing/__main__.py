@@ -1,4 +1,5 @@
 import sys
+
 from PyQt6.QtWidgets import QApplication
 
 from shapefile_processing.main_window import MainWindow
