@@ -5,16 +5,16 @@ import pandas as pd
 
 
 class DataQualityServices:
-    """Provides methods for assessing the quality of spatial data, such as detecting
-    invalid geometries, overlaps, and spatial outliers.
-    """
+    """Provides methods for assessing the quality of spatial data."""
 
     def detect_invalid_geometry(
         self,
         gdf: gpd.GeoDataFrame,
         column_name: str = "invalid_geom",
     ) -> gpd.GeoDataFrame:
-        """Detects invalid geometries in the GeoDataFrame and adds a boolean column
+        """Detects invalid geometries in the GeoDataFrame.
+        
+        Detects invalid geometries in the GeoDataFrame and adds a boolean column
         indicating validity.
 
         Args:
@@ -36,7 +36,9 @@ class DataQualityServices:
         gdf: gpd.GeoDataFrame,
         column_name: str = "overlap",
     ) -> gpd.GeoDataFrame:
-        """Detects overlapping polygons in the GeoDataFrame and adds a boolean column
+        """Detects overlapping polygons in the GeoDataFrame.
+        
+        Detects overlapping polygons in the GeoDataFrame and adds a boolean column
         indicating overlaps.
 
         Args:

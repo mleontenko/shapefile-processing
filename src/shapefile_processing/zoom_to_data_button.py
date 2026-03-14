@@ -12,7 +12,9 @@ _ASSETS_DIR = Path(__file__).parent / "assets"
 
 
 class ZoomToDataButton(QObject):
-    """Overlay button that triggers zooming to data when clicked.
+    """Button overlay for zooming to data extents in the plot.
+    
+    Overlay button that triggers zooming to data when clicked.
     It is positioned in the bottom-right corner of the plot and
     adjusts its position on window resize or state changes.
     """
@@ -49,7 +51,9 @@ class ZoomToDataButton(QObject):
         self.button.setEnabled(enabled)
 
     def schedule_reposition(self) -> None:
-        """Schedules the button to be repositioned on the next event loop cycle
+        """Schedule repositioning of button.
+        
+        Schedules the button to be repositioned on the next event loop cycle
         after Qt finishes processing current events and updating the layout.
         This ensures layout is ready.
         """
@@ -87,8 +91,6 @@ class ZoomToDataButton(QObject):
         )
 
     def _clear_references(self) -> None:
-        """Clears references to the plot widget and viewport to avoid errors
-        during teardown.
-        """
+        """Clear widget references during teardown."""
         self.plot_widget = None
         self.viewport = None

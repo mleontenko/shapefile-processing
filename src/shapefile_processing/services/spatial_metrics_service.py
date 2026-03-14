@@ -4,16 +4,16 @@ import geopandas as gpd
 
 
 class SpatialMetricsService:
-    """Provides methods for calculating spatial metrics such as area, perimeter,
-    nearest neighbor distance, and vertex counts.
-    """
+    """Provides methods for calculating spatial metrics."""
 
     def calculate_area(
         self,
         gdf: gpd.GeoDataFrame,
         column_name: str = "area",
     ) -> gpd.GeoDataFrame:
-        """Calculates the area of each geometry in the GeoDataFrame and adds it
+        """Calculates the area of each geometry
+        
+        Calculates the area of each geometry in the GeoDataFrame and adds it
         as a new column.
 
         Args:
@@ -31,7 +31,9 @@ class SpatialMetricsService:
         gdf: gpd.GeoDataFrame,
         column_name: str = "perimeter",
     ) -> gpd.GeoDataFrame:
-        """Calculates the perimeter of each geometry in the GeoDataFrame and adds
+        """Calculates the perimeter of each geometry.
+        
+        Calculates the perimeter of each geometry in the GeoDataFrame and adds
         it as a new column.
 
         Args:
@@ -52,7 +54,9 @@ class SpatialMetricsService:
         nearest_column_name: str = "nearest",
         id_column_name: str = "id",
     ) -> gpd.GeoDataFrame:
-        """Calculates the distance to the nearest neighbor for each geometry and adds
+        """Calculates the distance to the nearest neighbor.
+        
+        Calculates the distance to the nearest neighbor for each geometry and adds
         it as a new column.
 
         Also adds a column with the identifier of the nearest neighbor.
@@ -125,7 +129,9 @@ class SpatialMetricsService:
         radius: float = 1.0,
         column_name: str = "num_neighb",
     ) -> gpd.GeoDataFrame:
-        """Calculates the number of neighbors within a specified radius for each
+        """Calculates number of neighbours.
+        
+        Calculates the number of neighbors within a specified radius for each
         geometry and adds it as a new column.
 
         Args:
@@ -173,7 +179,9 @@ class SpatialMetricsService:
         x_column: str = "centroid_x",
         y_column: str = "centroid_y",
     ) -> gpd.GeoDataFrame:
-        """Calculates the centroid coordinates of each geometry and adds them as
+        """Calculates the centroid coordinates.
+        
+        Calculates the centroid coordinates of each geometry and adds them as
         new columns.
 
         Args:
@@ -194,7 +202,9 @@ class SpatialMetricsService:
         gdf: gpd.GeoDataFrame,
         column_name: str = "num_vertices",
     ) -> gpd.GeoDataFrame:
-        """Counts the number of vertices for each geometry, excluding the
+        """Count nuof vertices for each geometry.
+        
+        Counts the number of vertices for each geometry, excluding the
         closing point for polygons.
 
         Args:
@@ -208,9 +218,7 @@ class SpatialMetricsService:
         return gdf
 
     def _count_polygon_vertices(self, geom) -> int | None:
-        """Counts the number of vertices for a geometry, excluding the closing
-        point for polygons.
-        """
+        """Counts the number of vertices for a geometry"""
         if geom is None or geom.is_empty:
             return None
 
