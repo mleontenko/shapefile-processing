@@ -1,7 +1,7 @@
 import unittest
 
 import geopandas as gpd
-from shapely.geometry import Polygon
+from shapely.geometry import MultiPolygon, Polygon
 
 from shapefile_processing.services.spatial_metrics_service import SpatialMetricsService
 
@@ -77,6 +77,36 @@ class SpatialMetricsServiceTests(unittest.TestCase):
         self.assertIn('centroid_y', result.columns)
         self.assertAlmostEqual(1.333333, float(result.loc[0, 'centroid_x']), places=5)
         self.assertAlmostEqual(0.666667, float(result.loc[0, 'centroid_y']), places=5)
+
+    def test_calculate_number_of_vertices_excludes_closing_point(self) -> None:
+        polygon = Polygon([(0, 0), (2, 0), (2, 2), (0, 0)])
+        gdf = gpd.GeoDataFrame({'id': [1]}, geometry=[polygon], crs='EPSG:25884')
+
+        result = self.service.calculate_number_of_vertices(gdf.copy())
+
+        self.assertIn('num_vertices', result.columns)
+        self.assertEqual([3], result['num_vertices'].tolist())
+
+    def test_calculate_number_of_vertices_supports_multipolygon(self) -> None:
+        polygon_a = Polygon([(0, 0), (2, 0), (2, 2), (0, 0)])
+        polygon_b = Polygon([(3, 0), (4, 0), (4, 1), (3, 0)])
+        multipolygon = MultiPolygon([polygon_a, polygon_b])
+        gdf = gpd.GeoDataFrame({'id': [1]}, geometry=[multipolygon], crs='EPSG:25884')
+
+        result = self.service.calculate_number_of_vertices(gdf.copy())
+
+        self.assertIn('num_vertices', result.columns)
+        self.assertEqual([6], result['num_vertices'].tolist())
+
+    def test_calculate_number_of_vertices_counts_invalid_polygon(self) -> None:
+        invalid_polygon = Polygon([(0, 0), (2, 2), (0, 2), (2, 0), (0, 0)])
+        self.assertFalse(invalid_polygon.is_valid)
+        gdf = gpd.GeoDataFrame({'id': [1]}, geometry=[invalid_polygon], crs='EPSG:25884')
+
+        result = self.service.calculate_number_of_vertices(gdf.copy())
+
+        self.assertIn('num_vertices', result.columns)
+        self.assertEqual([4], result['num_vertices'].tolist())
 
 
 if __name__ == '__main__':

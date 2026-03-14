@@ -95,6 +95,15 @@ class ShapefileManager:
         )
         return len(self.loaded_gdf)
 
+    def calculate_number_of_vertices(self) -> int | None:
+        if self.loaded_gdf is None:
+            return None
+
+        self.loaded_gdf = self.spatial_metrics_service.calculate_number_of_vertices(
+            self.loaded_gdf,
+        )
+        return len(self.loaded_gdf)
+
     def detect_invalid_geometry(self) -> tuple[int, int] | None:
         if self.loaded_gdf is None:
             return None

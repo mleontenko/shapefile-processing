@@ -178,11 +178,12 @@ class MainWindow(QMainWindow):
         self.shapefile_manager.calculate_distance_to_nearest_neighbor()
         self.shapefile_manager.calculate_number_of_neighbors()
         self.shapefile_manager.calculate_centroid_coordinates()
+        self.shapefile_manager.calculate_number_of_vertices()
 
         QMessageBox.information(
             self,
             'Spatial Attributes Calculated',
-            f'Calculated area, perimeter, nearest neighbour distance, number of neighbors, and centroid coordinates for {updated_count} features.',
+            f'Calculated area, perimeter, nearest neighbour distance, number of neighbors, centroid coordinates, and number of vertices for {updated_count} features.',
         )
 
     def data_quality_checks(self) -> None:

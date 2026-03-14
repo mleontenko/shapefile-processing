@@ -116,3 +116,45 @@ class SpatialMetricsService:
         gdf[x_column] = gdf.geometry.centroid.x
         gdf[y_column] = gdf.geometry.centroid.y
         return gdf
+
+    def calculate_number_of_vertices(
+        self,
+        gdf: gpd.GeoDataFrame,
+        column_name: str = 'num_vertices',
+    ) -> gpd.GeoDataFrame:
+        """
+        Counts the number of vertices for each geometry, excluding the closing point for polygons.
+
+        Args:
+            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to analyze
+            column_name (str): Name of the column to store the vertex counts
+
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame with the new column containing vertex counts
+        """
+        gdf[column_name] = gdf.geometry.apply(self._count_polygon_vertices)
+        return gdf
+
+    def _count_polygon_vertices(self, geom) -> int | None:
+        """
+        Counts the number of vertices for a geometry, excluding the closing point for polygons.
+        """
+        if geom is None or geom.is_empty:
+            return None
+
+        if geom.geom_type == 'Polygon':
+            count = len(geom.exterior.coords)
+            if count > 1 and geom.exterior.coords[0] == geom.exterior.coords[-1]:
+                return count - 1
+            return count
+
+        if geom.geom_type == 'MultiPolygon':
+            return sum(
+                len(part.exterior.coords) - 1
+                if len(part.exterior.coords) > 1 and part.exterior.coords[0] == part.exterior.coords[-1]
+                else len(part.exterior.coords)
+                for part in geom.geoms
+                if not part.is_empty
+            )
+
+        return None
