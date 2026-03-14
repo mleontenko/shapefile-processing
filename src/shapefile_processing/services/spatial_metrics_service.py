@@ -7,6 +7,16 @@ class SpatialMetricsService:
         gdf: gpd.GeoDataFrame,
         column_name: str = 'area',
     ) -> gpd.GeoDataFrame:
+        """
+        Calculates the area of each geometry in the GeoDataFrame and adds it as a new column.
+
+        Args:
+            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to analyze
+            column_name (str): Name of the column to store the area values
+
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame with the new column containing area values
+        """
         gdf[column_name] = gdf.geometry.area
         return gdf
 
@@ -15,6 +25,16 @@ class SpatialMetricsService:
         gdf: gpd.GeoDataFrame,
         column_name: str = 'perimeter',
     ) -> gpd.GeoDataFrame:
+        """
+        Calculates the perimeter of each geometry in the GeoDataFrame and adds it as a new column.
+
+        Args:
+            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to analyze  
+            column_name (str): Name of the column to store the perimeter values
+        
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame with the new column containing perimeter values
+        """
         gdf[column_name] = gdf.geometry.length
         return gdf
 
@@ -25,6 +45,19 @@ class SpatialMetricsService:
         nearest_column_name: str = 'nearest',
         id_column_name: str = 'id',
     ) -> gpd.GeoDataFrame:
+        """
+        Calculates the distance to the nearest neighbor for each geometry and adds it as a new column.
+        Also adds a column with the identifier of the nearest neighbor.
+
+        Args:
+            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to analyze
+            column_name (str): Name of the column to store the nearest neighbor distances
+            nearest_column_name (str): Name of the column to store the nearest neighbor identifiers
+            id_column_name (str): Name of the identifier column in the input GeoDataFrame
+
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame with the new columns containing nearest neighbor distances and identifiers
+        """
         left = gdf.reset_index(drop=True)
         right = left.copy()
 
@@ -81,6 +114,17 @@ class SpatialMetricsService:
         radius: float = 1.0,
         column_name: str = 'num_neighb',
     ) -> gpd.GeoDataFrame:
+        """    
+        Calculates the number of neighbors within a specified radius for each geometry and adds it as a new column.
+
+        Args:
+            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to analyze
+            radius (float): Radius within which to count neighbors
+            column_name (str): Name of the column to store the neighbor counts
+
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame with the new column containing neighbor counts
+        """
         left = gdf.reset_index(drop=True)
         right = left.copy()
 
@@ -113,6 +157,17 @@ class SpatialMetricsService:
         x_column: str = 'centroid_x',
         y_column: str = 'centroid_y',
     ) -> gpd.GeoDataFrame:
+        """
+        Calculates the centroid coordinates of each geometry and adds them as new columns.
+
+        Args:
+            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to analyze
+            x_column (str): Name of the column to store the centroid X coordinates
+            y_column (str): Name of the column to store the centroid Y coordinates
+        
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame with the new columns containing centroid coordinates
+        """
         gdf[x_column] = gdf.geometry.centroid.x
         gdf[y_column] = gdf.geometry.centroid.y
         return gdf
