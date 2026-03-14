@@ -1,7 +1,11 @@
 from collections.abc import Callable
+from pathlib import Path
 
-from PyQt6.QtCore import QEvent, QObject, QTimer
+from PyQt6.QtCore import QEvent, QObject, QSize, QTimer
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QPushButton
+
+_ASSETS_DIR = Path(__file__).parent / 'assets'
 import pyqtgraph as pg
 
 
@@ -11,6 +15,8 @@ class ZoomToDataButton(QObject):
         self.plot_widget: pg.PlotWidget | None = plot_widget
         self.viewport = plot_widget.viewport()
         self.button = QPushButton('Zoom to Data', self.viewport)
+        self.button.setIcon(QIcon(str(_ASSETS_DIR / 'magnifying-glass.svg')))
+        self.button.setIconSize(QSize(16, 16))
         self.button.setAutoDefault(False)
         self.button.setDefault(False)
         self.button.setEnabled(False)
