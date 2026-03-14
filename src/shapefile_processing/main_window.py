@@ -203,16 +203,24 @@ class MainWindow(QMainWindow):
             return
         overlap_count, _ = overlap_result
 
+        outlier_result = self.shapefile_manager.detect_spatial_outliers()
+        if outlier_result is None:
+            QMessageBox.information(self, 'No Layer Loaded', 'Please load a shapefile first.')
+            return
+        outlier_count, _ = outlier_result
+
         QMessageBox.information(
             self,
             'Data Quality Checks',
             f'Data quality checks complete.\n\n'
             f'  \u2022 Features checked   : {total_count}\n'
             f'  \u2022 Invalid geometries  : {invalid_count}\n'
-            f'  \u2022 Overlapping polygons: {overlap_count}\n\n'
+            f'  \u2022 Overlapping polygons: {overlap_count}\n'
+            f'  \u2022 Spatial outliers    : {outlier_count}\n\n'
             f'Columns added to layer:\n'
             f'  - "invalid_geom" (True = invalid geometry)\n'
-            f'  - "overlap"      (True = overlaps another polygon)',
+            f'  - "overlap"      (True = overlaps another polygon)\n'
+            f'  - "outlier" (True = no neighbour within threshold distance)',
         )
 
     def zoom_to_data(self) -> None:

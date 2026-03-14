@@ -75,6 +75,32 @@ class DataQualityServicesTests(unittest.TestCase):
 
         self.assertEqual([True, True], result['overlap'].tolist())
 
+    def test_detect_spatial_outliers_uses_edge_to_edge_distance(self) -> None:
+        # nearest edge distances: a<->b = 1, c<->b = 7
+        polygon_a = Polygon([(0, 0), (1, 0), (1, 1), (0, 0)])
+        polygon_b = Polygon([(2, 0), (3, 0), (3, 1), (2, 0)])
+        polygon_c = Polygon([(10, 0), (11, 0), (11, 1), (10, 0)])
+
+        gdf = gpd.GeoDataFrame(
+            {'id': [1, 2, 3]},
+            geometry=[polygon_a, polygon_b, polygon_c],
+            crs='EPSG:25884',
+        )
+
+        result = self.service.detect_spatial_outliers(gdf, distance_threshold=1.5)
+
+        self.assertIn('spatial_outlier', result.columns)
+        self.assertEqual([False, False, True], result['spatial_outlier'].tolist())
+        self.assertNotIn('spatial_outlier', gdf.columns)
+
+    def test_detect_spatial_outliers_single_feature_is_outlier(self) -> None:
+        polygon = Polygon([(0, 0), (1, 0), (1, 1), (0, 0)])
+        gdf = gpd.GeoDataFrame({'id': [1]}, geometry=[polygon], crs='EPSG:25884')
+
+        result = self.service.detect_spatial_outliers(gdf, distance_threshold=1.0)
+
+        self.assertEqual([True], result['spatial_outlier'].tolist())
+
 
 if __name__ == '__main__':
     unittest.main()

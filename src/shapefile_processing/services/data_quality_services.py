@@ -45,3 +45,61 @@ class DataQualityServices:
         gdf[column_name] = gdf.index.isin(overlapping_indices)
         gdf[column_name] = gdf[column_name].astype(bool)
         return gdf
+
+    def detect_spatial_outliers(
+        self,
+        gdf: gpd.GeoDataFrame,
+        distance_threshold: float = 1.0,
+        column_name: str = 'spatial_outlier',
+    ) -> gpd.GeoDataFrame:
+        """
+        Identifies spatial outliers based on distance to nearest neighbor.
+
+        Args:
+            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to analyze
+            distance_threshold (float): Distance threshold to classify outliers
+            column_name (str): Name of the column to store the outlier flags
+
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame with the new column containing outlier flags
+        """
+        gdf = gdf.copy().reset_index(drop=True)
+        gdf[column_name] = False
+
+        if gdf.empty:
+            return gdf
+
+        if len(gdf) == 1:
+            gdf[column_name] = True
+            return gdf
+
+        distance_col = '_nearest_edge_distance'
+
+        # sjoin_nearest() calculates distance to nearest neighbour
+        # if polygons are separeate - distance is from nearest edge to nearest edge
+        # if polygons touch or overlap, distance is 0
+        # exclusive = True avoids matching feature to iteslf
+        nearest = gpd.sjoin_nearest(
+            gdf,
+            gdf,
+            how='left',
+            distance_col=distance_col,
+            lsuffix='left',
+            rsuffix='right',
+            max_distance=None,
+            exclusive=True,
+        )
+
+        if nearest.empty:
+            gdf[column_name] = True
+            return gdf
+
+        # If multiple candidates exist (ties), keep the first one with minimum distance
+        nearest_per_feature = nearest.sort_values(distance_col).groupby(level=0, sort=False).first()
+        # reindex to original gdf order and assign distances
+        nearest_distances = nearest_per_feature[distance_col].reindex(gdf.index)
+
+        # classify as outlier if nearest neighbor is farther than threshold or if no neighbors exist (NaN distance)
+        gdf[column_name] = nearest_distances.isna() | (nearest_distances > distance_threshold)
+        gdf[column_name] = gdf[column_name].astype(bool)
+        return gdf

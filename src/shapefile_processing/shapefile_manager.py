@@ -122,6 +122,18 @@ class ShapefileManager:
         total_count = len(self.loaded_gdf)
         return overlap_count, total_count
 
+    def detect_spatial_outliers(self, distance_threshold: float = 1.0) -> tuple[int, int] | None:
+        if self.loaded_gdf is None:
+            return None
+
+        self.loaded_gdf = self.data_quality_services.detect_spatial_outliers(
+            self.loaded_gdf,
+            distance_threshold=distance_threshold,
+        )
+        outlier_count = int(self.loaded_gdf['spatial_outlier'].sum())
+        total_count = len(self.loaded_gdf)
+        return outlier_count, total_count
+
     def export_shapefile(self, output_path: str | PathLike[str]) -> bool:
         if self.loaded_gdf is None:
             return False
