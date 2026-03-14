@@ -1,13 +1,12 @@
 from os import PathLike
 
-from PyQt6.QtCore import QEvent, QObject, QTimer
+from PyQt6.QtCore import QEvent
 from PyQt6.QtGui import QAction, QShowEvent
 from PyQt6.QtWidgets import (
     QDialog,
     QFileDialog,
     QMainWindow,
     QMessageBox,
-    QPushButton,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
@@ -16,6 +15,7 @@ import pyqtgraph as pg
 
 from shapefile_processing.map_renderer import MapRenderer
 from shapefile_processing.shapefile_manager import ShapefileManager
+from shapefile_processing.zoom_to_data_button import ZoomToDataButton
 
 pg.setConfigOptions(antialias=True)
 
@@ -42,18 +42,8 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.plot_widget)
 
-        self.zoom_to_data_button = QPushButton('Zoom to Data', self.plot_widget.viewport())
-        self.zoom_to_data_button.setAutoDefault(False)
-        self.zoom_to_data_button.setDefault(False)
-        self.zoom_to_data_button.setEnabled(False)
-        self.zoom_to_data_button.clicked.connect(self.zoom_to_data)
-
-        # ensure button size 
-        self.zoom_to_data_button.adjustSize()
-
-        # enable eventFilter onplot widget viewport
-        # change button position on window resize
-        self.plot_widget.viewport().installEventFilter(self)
+        self.zoom_to_data_overlay = ZoomToDataButton(self.plot_widget, self.zoom_to_data)
+        self.zoom_to_data_button = self.zoom_to_data_overlay.button
 
         self.create_menu()
         self.create_toolbar()
@@ -110,38 +100,14 @@ class MainWindow(QMainWindow):
     # showEvent is triggered after window is shown
     def showEvent(self, event: QShowEvent) -> None:
         super().showEvent(event)
-        self._schedule_zoom_button_reposition()
+        self.zoom_to_data_overlay.schedule_reposition()
 
     # catches fullscreen/maximize transitions
     # changeEvent is triggered when state/property changes
     def changeEvent(self, event: QEvent) -> None:
         super().changeEvent(event)
         if event.type() == QEvent.Type.WindowStateChange:
-            self._schedule_zoom_button_reposition()
-    
-    # catches manual resize events
-    def eventFilter(self, obj: QObject | None, event: QEvent | None) -> bool:
-        if (
-            obj is self.plot_widget.viewport()
-            and event is not None
-            and event.type() == QEvent.Type.Resize
-        ):
-            self._reposition_zoom_button()
-        return super().eventFilter(obj, event)
-
-    def _schedule_zoom_button_reposition(self) -> None:
-        # run this on the next event loop cycle
-        # after Qt finishing processing current events and updating the layout
-        # this ensures the layout is ready
-        QTimer.singleShot(0, self._reposition_zoom_button)
-
-    def _reposition_zoom_button(self) -> None:
-        vb = self.plot_widget.getPlotItem().getViewBox()
-        scene_rect = vb.sceneBoundingRect()
-        br = self.plot_widget.mapFromScene(scene_rect.bottomRight())
-        btn = self.zoom_to_data_button
-        margin = 6
-        btn.move(br.x() - btn.width() - margin, br.y() - btn.height() - margin)
+            self.zoom_to_data_overlay.schedule_reposition()
 
     def load_shapefile(self) -> None:
         file_name, _ = QFileDialog.getOpenFileName(
