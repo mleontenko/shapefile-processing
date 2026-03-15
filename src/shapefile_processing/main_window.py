@@ -7,10 +7,7 @@ from PyQt6.QtCore import QEvent
 from PyQt6.QtGui import QAction, QShowEvent
 from PyQt6.QtWidgets import (
     QDialog,
-    QDialogButtonBox,
     QFileDialog,
-    QLabel,
-    QLineEdit,
     QMainWindow,
     QMessageBox,
     QTableWidget,
@@ -19,6 +16,7 @@ from PyQt6.QtWidgets import (
 )
 
 from shapefile_processing.map_renderer import MapRenderer
+from shapefile_processing.parameters_dialog import ParametersDialog
 from shapefile_processing.shapefile_manager import ShapefileManager
 from shapefile_processing.zoom_to_data_button import ZoomToDataButton
 
@@ -158,66 +156,17 @@ class MainWindow(QMainWindow):
 
     def open_parameters_dialog(self) -> None:
         """Open dialog to configure the ID prefix used by assign_ids()."""
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Parameters")
-
-        layout = QVBoxLayout(dialog)
-        layout.addWidget(QLabel("ID prefix for Assign IDs:"))
-
-        prefix_input = QLineEdit(dialog)
-        prefix_input.setText(self.shapefile_manager.id_prefix)
-        layout.addWidget(prefix_input)
-
-        layout.addWidget(QLabel("Radius for number of neighbors:"))
-        radius_input = QLineEdit(dialog)
-        radius_input.setText(str(self.shapefile_manager.neighbor_radius))
-        layout.addWidget(radius_input)
-
-        layout.addWidget(QLabel("Distance threshold for spatial outliers:"))
-        threshold_input = QLineEdit(dialog)
-        threshold_input.setText(str(self.shapefile_manager.outlier_distance_threshold))
-        layout.addWidget(threshold_input)
-
-        buttons = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok
-            | QDialogButtonBox.StandardButton.Cancel,
-            parent=dialog,
+        dialog = ParametersDialog(
+            id_prefix=self.shapefile_manager.id_prefix,
+            neighbor_radius=self.shapefile_manager.neighbor_radius,
+            outlier_distance_threshold=self.shapefile_manager.outlier_distance_threshold,
+            parent=self,
         )
-        layout.addWidget(buttons)
-
-        buttons.accepted.connect(dialog.accept)
-        buttons.rejected.connect(dialog.reject)
 
         if dialog.exec() != QDialog.DialogCode.Accepted:
             return
 
-        prefix = prefix_input.text().strip()
-        if not prefix:
-            QMessageBox.information(
-                self,
-                "Invalid Prefix",
-                'Prefix cannot be empty. Keeping default "BLD_".',
-            )
-            prefix = "BLD_"
-
-        try:
-            radius = float(radius_input.text().strip())
-            threshold = float(threshold_input.text().strip())
-        except ValueError:
-            QMessageBox.information(
-                self,
-                "Invalid Parameters",
-                "Radius and distance threshold must be numeric values.",
-            )
-            return
-
-        if radius < 0 or threshold < 0:
-            QMessageBox.information(
-                self,
-                "Invalid Parameters",
-                "Radius and distance threshold must be non-negative values.",
-            )
-            return
+        prefix, radius, threshold = dialog.get_values()
 
         self.shapefile_manager.set_id_prefix(prefix)
         self.shapefile_manager.set_neighbor_radius(radius)
