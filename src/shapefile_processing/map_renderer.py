@@ -17,6 +17,13 @@ class MapRenderer:
             plot_widget (pg.PlotWidget): The PyQtGraph plot widget to render on
         """
         self.plot_widget = plot_widget
+        self._label_items: list[pg.TextItem] = []
+
+    def _clear_labels(self) -> None:
+        """Remove previously rendered label items from the plot."""
+        for label_item in self._label_items:
+            self.plot_widget.removeItem(label_item)
+        self._label_items.clear()
 
     def render_polygons(self, gdf: gpd.GeoDataFrame) -> None:
         """Draw polygon and multipolygon geometries from a GeoDataFrame.
@@ -54,6 +61,8 @@ class MapRenderer:
             gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to label
             column_name (str): Name of the column to use for label text
         """
+        self._clear_labels()
+
         for _, row in gdf.iterrows():
             if row.geometry is None or row.geometry.is_empty:
                 continue
@@ -65,6 +74,7 @@ class MapRenderer:
             )
             label.setPos(centroid.x, centroid.y)
             self.plot_widget.addItem(label)
+            self._label_items.append(label)
 
     def set_plot_range(self, gdf: gpd.GeoDataFrame) -> None:
         """Set the plot view to fit the bounds of the GeoDataFrame geometries.

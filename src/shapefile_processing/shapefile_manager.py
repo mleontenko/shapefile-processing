@@ -38,6 +38,9 @@ class ShapefileManager:
         )
         self.data_quality_services = data_quality_services or DataQualityServices()
         self.loaded_gdf: gpd.GeoDataFrame | None = None
+        self.id_prefix: str = "BLD_"
+        self.neighbor_radius: float = 1.0
+        self.outlier_distance_threshold: float = 1.0
 
     def load_and_render(self, file_name: str | PathLike[str]) -> bool:
         """Load a shapefile and render features on the plot widget.
@@ -83,13 +86,37 @@ class ShapefileManager:
 
         feature_count = len(self.loaded_gdf)
         self.loaded_gdf["id"] = [
-            f"BLD_{index}" for index in range(1, feature_count + 1)
+            f"{self.id_prefix}{index}" for index in range(1, feature_count + 1)
         ]
         # convert 'id' column to object type to ensure compatibility 
         #with shapefile export
         self.loaded_gdf["id"] = self.loaded_gdf["id"].astype("object")
         self.map_renderer.render_labels(self.loaded_gdf, column_name="id")
         return feature_count
+
+    def set_id_prefix(self, prefix: str) -> None:
+        """Set the prefix used by assign_ids().
+
+        Args:
+            prefix (str): Prefix to prepend to generated numeric IDs.
+        """
+        self.id_prefix = prefix
+
+    def set_neighbor_radius(self, radius: float) -> None:
+        """Set radius used by calculate_number_of_neighbors().
+
+        Args:
+            radius (float): Radius value in the layer CRS units.
+        """
+        self.neighbor_radius = radius
+
+    def set_outlier_distance_threshold(self, threshold: float) -> None:
+        """Set distance threshold used by detect_spatial_outliers().
+
+        Args:
+            threshold (float): Outlier distance threshold in layer CRS units.
+        """
+        self.outlier_distance_threshold = threshold
 
     def calculate_area(self) -> int | None:
         """Calculate and store feature area for the loaded layer.
