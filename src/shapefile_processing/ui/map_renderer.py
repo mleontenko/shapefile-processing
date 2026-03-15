@@ -12,9 +12,9 @@ class MapRenderer:
 
     def __init__(self, plot_widget: pg.PlotWidget) -> None:
         """Initialize renderer with the target plot widget.
-        
+
         Args:
-            plot_widget (pg.PlotWidget): The PyQtGraph plot widget to render on
+            plot_widget (pg.PlotWidget): The PyQtGraph plot widget to render on.
         """
         self.plot_widget = plot_widget
         self._label_items: list[pg.TextItem] = []
@@ -27,9 +27,9 @@ class MapRenderer:
 
     def render_polygons(self, gdf: gpd.GeoDataFrame) -> None:
         """Draw polygon and multipolygon geometries from a GeoDataFrame.
-        
+
         Args:
-            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to render
+            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to render.
         """
         for geometry in gdf.geometry:
             if geometry is None or geometry.is_empty:
@@ -56,10 +56,10 @@ class MapRenderer:
 
     def render_labels(self, gdf: gpd.GeoDataFrame, column_name: str = "id") -> None:
         """Draw text labels at feature centroids using the selected attribute.
-        
+
         Args:
-            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to label
-            column_name (str): Name of the column to use for label text
+            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to label.
+            column_name (str): Name of the column to use for label text.
         """
         self._clear_labels()
 
@@ -78,12 +78,9 @@ class MapRenderer:
 
     def set_plot_range(self, gdf: gpd.GeoDataFrame) -> None:
         """Set the plot view to fit the bounds of the GeoDataFrame geometries.
-        
-        Fit the view to layer bounds, with fallback to auto-range for degenerate 
-        extents.
 
         Args:
-            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to fit
+            gdf (gpd.GeoDataFrame): GeoDataFrame containing the geometries to fit.
         """
         bounds = gdf.total_bounds
         min_x, min_y, max_x, max_y = bounds

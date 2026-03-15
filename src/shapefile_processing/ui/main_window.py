@@ -15,10 +15,10 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-from shapefile_processing.map_renderer import MapRenderer
-from shapefile_processing.parameters_dialog import ParametersDialog
 from shapefile_processing.shapefile_manager import ShapefileManager
-from shapefile_processing.zoom_to_data_button import ZoomToDataButton
+from shapefile_processing.ui.map_renderer import MapRenderer
+from shapefile_processing.ui.parameters_dialog import ParametersDialog
+from shapefile_processing.ui.zoom_to_data_button import ZoomToDataButton
 
 pg.setConfigOptions(antialias=True)
 

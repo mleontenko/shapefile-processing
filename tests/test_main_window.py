@@ -3,7 +3,7 @@ import unittest
 
 from PyQt6.QtWidgets import QApplication
 
-from shapefile_processing.main_window import MainWindow
+from shapefile_processing.ui.main_window import MainWindow
 
 
 class MainWindowTests(unittest.TestCase):

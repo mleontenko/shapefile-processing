@@ -8,7 +8,7 @@ from PyQt6.QtCore import QEvent, QObject, QSize, QTimer
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QPushButton
 
-_ASSETS_DIR = Path(__file__).parent / "assets"
+_ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 
 
 class ZoomToDataButton(QObject):
@@ -22,7 +22,12 @@ class ZoomToDataButton(QObject):
     def __init__(
         self, plot_widget: pg.PlotWidget, on_click: Callable[[], None]
     ) -> None:
-        """Initializes the ZoomToDataButton."""
+        """Initialize overlay button and attach event hooks.
+
+        Args:
+            plot_widget (pg.PlotWidget): Plot widget where the button is overlaid.
+            on_click (Callable[[], None]): Callback to execute when clicked.
+        """
         super().__init__(plot_widget)
         self.plot_widget: pg.PlotWidget | None = plot_widget
         self.viewport = plot_widget.viewport()
@@ -40,13 +45,10 @@ class ZoomToDataButton(QObject):
         self.viewport.destroyed.connect(self._clear_references)
 
     def setEnabled(self, enabled: bool) -> None:
-        """Enables or disables the button.
+        """Enable or disable the overlay button.
 
         Args:
-            enabled (bool): True to enable the button, False to disable it
-
-        Returns:
-            None
+            enabled (bool): True to enable the button, False to disable it.
         """
         self.button.setEnabled(enabled)
 
@@ -59,7 +61,6 @@ class ZoomToDataButton(QObject):
         """
         QTimer.singleShot(0, self.reposition)
 
-    # catches manual resize events
     def eventFilter(self, obj: QObject | None, event: QEvent | None) -> bool:
         """Listens for resize events on the viewport to reposition the button.
 
