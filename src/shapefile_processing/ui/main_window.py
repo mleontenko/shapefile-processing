@@ -14,6 +14,7 @@ from PyQt6.QtWidgets import (
 
 from shapefile_processing.shapefile_manager import ShapefileManager
 from shapefile_processing.ui.attribute_table_dialog import AttributeTableDialog
+from shapefile_processing.ui.help_dialog import HelpDialog
 from shapefile_processing.ui.map_renderer import MapRenderer
 from shapefile_processing.ui.parameters_dialog import ParametersDialog
 from shapefile_processing.ui.zoom_to_data_button import ZoomToDataButton
@@ -62,8 +63,10 @@ class MainWindow(QMainWindow):
         assert menu_bar is not None
         file_menu = menu_bar.addMenu("File")
         view_menu = menu_bar.addMenu("View")
+        help_menu = menu_bar.addMenu("Help")
         assert file_menu is not None
         assert view_menu is not None
+        assert help_menu is not None
 
         load_action = QAction("Load Shapefile", self)
         load_action.triggered.connect(self.load_shapefile)
@@ -76,6 +79,10 @@ class MainWindow(QMainWindow):
         attribute_table_action = QAction("Attribute Table", self)
         attribute_table_action.triggered.connect(self.show_attribute_table)
         view_menu.addAction(attribute_table_action)
+
+        help_action = QAction("Instructions", self)
+        help_action.triggered.connect(self.open_help_dialog)
+        help_menu.addAction(help_action)
 
     def create_toolbar(self) -> None:
         """Create toolbar actions for IDs, spatial attributes, and quality checks."""
@@ -206,6 +213,11 @@ class MainWindow(QMainWindow):
 
         table_dialog = AttributeTableDialog(attributes, parent=self)
         table_dialog.exec()
+
+    def open_help_dialog(self) -> None:
+        """Open a modal dialog with app usage instructions."""
+        dialog = HelpDialog(parent=self)
+        dialog.exec()
 
     def assign_ids(self) -> None:
         """Assign IDs to loaded features and notify the user."""
