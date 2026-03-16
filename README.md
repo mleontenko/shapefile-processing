@@ -53,3 +53,25 @@ poetry run ruff check src
 ```bash
 poetry run ruff check --select D1 src
 ```
+
+All source code is in src/shapefile processing package. Unit tests are separate in tests folder.
+
+─ src/
+  └─ shapefile_processing/
+     ├─ __init__.py
+     ├─ __main__.py
+     ├─ shapefile_manager.py
+     ├─ assets/
+     │  └─ magnifying-glass.svg
+     ├─ services/
+     │  ├─ __init__.py
+     │  ├─ data_quality_services.py
+     │  └─ spatial_metrics_service.py
+     └─ ui/
+        ├─ __init__.py
+        ├─ attribute_table_dialog.py
+        ├─ help_dialog.py
+        ├─ main_window.py
+        ├─ map_renderer.py
+        ├─ parameters_dialog.py
+        └─ zoom_to_data_button.py
