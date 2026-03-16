@@ -54,24 +54,38 @@ poetry run ruff check src
 poetry run ruff check --select D1 src
 ```
 
-All source code is in src/shapefile processing package. Unit tests are separate in tests folder.
+All source code is in the `src/shapefile_processing` package. Unit tests are in the `tests` folder.
 
-─ src/
-  └─ shapefile_processing/
-     ├─ __init__.py
-     ├─ __main__.py
-     ├─ shapefile_manager.py
-     ├─ assets/
-     │  └─ magnifying-glass.svg
-     ├─ services/
-     │  ├─ __init__.py
-     │  ├─ data_quality_services.py
-     │  └─ spatial_metrics_service.py
-     └─ ui/
-        ├─ __init__.py
-        ├─ attribute_table_dialog.py
-        ├─ help_dialog.py
-        ├─ main_window.py
-        ├─ map_renderer.py
-        ├─ parameters_dialog.py
-        └─ zoom_to_data_button.py
+### Project structure
+All code is in src/shapefile_processing package. Unit tests are separate in tests folder.
+
+```text
+src/
+└─ shapefile_processing/
+   ├─ __init__.py
+   ├─ __main__.py
+   ├─ shapefile_manager.py
+   ├─ assets/
+   │  └─ magnifying-glass.svg
+   ├─ services/
+   │  ├─ __init__.py
+   │  ├─ data_quality_services.py
+   │  └─ spatial_metrics_service.py
+   └─ ui/
+      ├─ __init__.py
+      ├─ attribute_table_dialog.py
+      ├─ help_dialog.py
+      ├─ main_window.py
+      ├─ map_renderer.py
+      ├─ parameters_dialog.py
+      └─ zoom_to_data_button.py
+```
+
+TODO:
+- support for non-metric crs by reprojecting
+- show polygon attributes by clicking on polygon
+- option to display OSM tiles as background layer
+- point layer for QC issues
+- additional spatial attributes calculation
+- detect mre QC issues
+- easier installation and running (e.g. double click icon)
